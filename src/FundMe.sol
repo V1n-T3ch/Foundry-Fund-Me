@@ -2,19 +2,18 @@
 
 pragma solidity ^0.8.18;
 
-import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-import { PriceConverter } from "./PriceConverter.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+import {PriceConverter} from "./PriceConverter.sol";
 
 error FundMe__NotOwner();
 
 contract FundMe {
-
     using PriceConverter for uint256;
 
     address private immutable i_owner;
-    uint256 public constant MINIMUM_USD =  50 * 1e18;
+    uint256 public constant MINIMUM_USD = 50 * 1e18;
     AggregatorV3Interface private s_priceFeed;
-    
+
     address[] private s_funders;
     mapping(address funder => uint256 amountFunded) private s_addressToAmountFunded;
 
@@ -35,28 +34,30 @@ contract FundMe {
 
     function cheaperWithdraw() public onlyOwner {
         uint256 fundersLength = s_funders.length;
-        for(uint256 i = 0; i < fundersLength; i++) {
+        for (uint256 i = 0; i < fundersLength; i++) {
             address funder = s_funders[i];
             s_addressToAmountFunded[funder] = 0;
         }
         s_funders = new address[](0);
-        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
+        (bool callSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Call failed");
     }
 
     function withdraw() public onlyOwner {
-        for(uint256 funderIndex = 0; funderIndex < s_funders.length; funderIndex++) {
+        for (uint256 funderIndex = 0; funderIndex < s_funders.length; funderIndex++) {
             address funder = s_funders[funderIndex];
             s_addressToAmountFunded[funder] = 0;
         }
         s_funders = new address[](0);
-        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
-        require (callSuccess, "Call failed");
+        (bool callSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess, "Call failed");
     }
 
     modifier onlyOwner() {
         // require(msg.sender==i_owner, "Sender is not the owner");
-        if(msg.sender != i_owner) { revert FundMe__NotOwner(); }
+        if (msg.sender != i_owner) {
+            revert FundMe__NotOwner();
+        }
         _;
     }
 
@@ -64,19 +65,19 @@ contract FundMe {
         fund();
     }
 
-    fallback() external payable { 
+    fallback() external payable {
         fund();
     }
 
-    function getAddressToAmountFunded(address fundingAddress) external view returns(uint256) {
+    function getAddressToAmountFunded(address fundingAddress) external view returns (uint256) {
         return s_addressToAmountFunded[fundingAddress];
     }
 
-    function getFunder(uint256 index) external view returns(address) {
+    function getFunder(uint256 index) external view returns (address) {
         return s_funders[index];
     }
 
-    function getOwner() external view returns(address) {
+    function getOwner() external view returns (address) {
         return i_owner;
     }
 }

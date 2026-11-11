@@ -18,10 +18,10 @@ The contract uses a Chainlink `AggregatorV3Interface` price feed to convert ETH 
 
 ```text
 src/
-  Fundme.sol              # Main FundMe contract
+  FundMe.sol              # Main FundMe contract
   PriceConverter.sol      # Chainlink price conversion helpers
 script/
-  DeployFundme.s.sol      # Deployment script
+  DeployFundMe.s.sol      # Deployment script
   HelperConfig.s.sol      # Local and Sepolia price-feed configuration
   Interactions.s.sol      # Fund and withdraw scripts
 test/
